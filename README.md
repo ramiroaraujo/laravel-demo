@@ -1,66 +1,94 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# message-board
+The bread-and-butter of Storyhunter is the ability of freelancers and publishers to communicate with each other. As such, we'd like to explore how you would structure a simple message exchange API. This test is designed to verify that:
+* You have proficiency with our tech stack
+* You are able to architect a working system from a small design brief
+* You are able to model relationships
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Requirements
+1. We will be building the api interface and data model for a simple message board.
 
-## About Laravel
+2. You should write your API in Laravel PHP. Feel free to use any officially supported packages. Your application and database should be able to run locally on a Mac or Linux system using Sail.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+3. Your APIs should follow a RESTful pattern. Responses should be sent in a well structured format of your choice.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+4. Please create one additional feature of your choosing.  This can be anything you think might be interesting or demonstrate your knowledge.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+5. Sending a new Message on a Thread should queue a job to notify the other members of the Thread of new activity.
+    1. This job should be delayed 1 minute
+    2. Additional jobs queued within that 1 minute for the same Thread + User should be consolidated. In other words, a User should get at most one notification per Thread per minute.
+    3. This job does not need to send an actual email. For the purposes of this project, it can simply log or output a notice to console.
 
-## Learning Laravel
+## Models
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### User
+* id (int)
+* email (string)
+* full name (string)
+* password (hashed string)
+* bio (string)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Thread
+* id (int)
+* title (string)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Message
+* id (int)
+* user_id (int)
+* thread_id (int)
+* body (string)
 
-## Laravel Sponsors
+## Endpoints
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+Endpoint parameters and return values are defined. You may decide whether parameters should be passed as part of the URL (eg `/users/{userId}`), as a query parameter, or as value in the request body. This does not need to be strictly RESTful, but you should be thoughtful in your decisions.
 
-### Premium Partners
+### Create User (un-authenticated)
+> * Accepts an email, password, full name, a short biography
+> * Returns an authentication token
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+### Login (un-authenticated)
+> * Accepts email and password
+> * Returns an authentication token
 
-## Contributing
+### Get User (authenticated)
+> * Accepts User id
+> * Returns User model
+    >   * User model password should be omitted
+>   * User model email should be omitted if User is not the authenticated User
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Create Thread (authenticated)
+> Any authenticated user can create a new Thread
+> * Accepts a title
+> * Returns a Thread model
 
-## Code of Conduct
+### Get User Threads (authenticated)
+> Returns all Threads that a given User has participated in
+> * Accepts a User id
+> * Returns a collection of Thread models
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Create Thread Message (authenticated)
+> Adds a Message to a given Thread. Authenticated users can add a Message to any existing Thread
+> * Accepts target Thread id, sending User id, Message body string
+> * Returns a Message model
 
-## Security Vulnerabilities
+### Edit Thread Message (authenticated)
+> A User may edit the body of a message they have sent for up to 5 minutes after creation
+> Accepts target Message id, new Message body string
+> Returns 200 status
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Get Thread Messages (authenticated)
+> Returns all Messages associated with a given Thread
+> * Accepts target Thread id
+> * Returns a collection of Message models
 
-## License
+### Search User Messages (authenticated)
+> Returns all Messages that a given User has sent, that match a provided search term
+> * Accepts target Thread id, search term string
+> * Returns a collection of Message models
+> * NOTE - You can decide whether to search strictly or loosely. Please document the behavior.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Submitting your work
+* When you have finished the assignment, create a github repository and share it with @jknight12882 and @soundsgoodsofar.
+* All submissions must include a `README.md` explaining how to install and run your application.
+* The `README.md` should contain notes about any design choices made that may not be immediately understood from reading the code
+* Code should be well commented
+* Your work should be "production ready"
