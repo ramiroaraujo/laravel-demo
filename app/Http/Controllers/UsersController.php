@@ -24,13 +24,15 @@ class UsersController extends Controller
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
-        return $this->getToken();
+
+        return ['token' => $this->getToken()];
     }
 
     public function register(RegisterUserRequest $request)
     {
         $user = User::create($request->validated());
         Auth::login($user);
-        return $this->getToken();
+
+        return ['token' => $this->getToken()];
     }
 }
