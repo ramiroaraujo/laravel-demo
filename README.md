@@ -29,8 +29,9 @@ There's no additional feature added per se. I chose to make use of many `Laravel
 1. Clone the repo
 2. Have `Docker` installed and running
 2. `composer install && npm install`
-3. `vendor/bin/sail up -d` to initialize the containers
-4. `vendor/bin/sail php artisan migrate` to bootstrap the database schema
+3. Copy `.env.example` to `.env`
+4. `vendor/bin/sail up -d` to initialize the containers
+5. `vendor/bin/sail php artisan migrate` to bootstrap the database schema
 
 ## Run
 
