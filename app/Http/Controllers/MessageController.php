@@ -25,6 +25,9 @@ class MessageController extends Controller
         return Message::whereThreadId($thread_id)->paginate(10);
     }
 
+    /**
+     * Perform a paginated search with scout, add the user data for each message
+     */
     public function search(User $user)
     {
         $search = request('search');
@@ -37,7 +40,7 @@ class MessageController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store the new Message linked to the logged in user
      */
     public function store(CreateMessageRequest $request, Thread $thread)
     {
@@ -45,11 +48,12 @@ class MessageController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the message text
      * @throws AuthorizationException|\Throwable
      */
     public function update(Request $request, Thread $thread, Message $message)
     {
+        //only the creator can update it, and only if less than 5 minutes have passed since creation
         $this->authorize('update', $message);
 
         $message->body = $request->body;
@@ -58,11 +62,12 @@ class MessageController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete the message
      * @throws AuthorizationException
      */
-    public function destroy(Request $request, Message $message)
+    public function destroy(Request $request, Thread $thread, Message $message)
     {
+        //only the creator can delete it
         $this->authorize('delete', $message);
 
         $message->delete();

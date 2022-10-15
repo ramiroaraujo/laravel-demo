@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Auth;
 class ThreadController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display the Threads, paginated
+     * if an optional user is passed, filter the list by the threads created by that user
      */
     public function index(User $user = null)
     {
@@ -24,7 +25,7 @@ class ThreadController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a new Thread associated with the logged in user
      */
     public function store(CreateThreadRequest $request)
     {
@@ -32,20 +33,20 @@ class ThreadController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Get the Thread
      */
     public function show(Thread $thread)
     {
         return $thread;
     }
 
-
     /**
-     * Update the specified resource in storage.
+     * Update the Thread
      * @throws AuthorizationException|\Throwable
      */
     public function update(CreateThreadRequest $request, Thread $thread)
     {
+        //only the creator can update it
         $this->authorize('update', $thread);
 
         $thread->title = $request->title;
@@ -54,11 +55,12 @@ class ThreadController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete the Thread
      * @throws AuthorizationException
      */
     public function destroy(Request $request, Thread $thread)
     {
+        //only the creator can delete it
         $this->authorize('delete', $thread);
 
         $thread->delete();

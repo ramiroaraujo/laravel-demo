@@ -27,7 +27,6 @@ class MessagePolicy
             Response::allow() : Response::deny('messages older than 5 minutes cannot be edited');
     }
 
-
     public function delete(User $user, Message $message)
     {
         return $message->user_id === $user->id;
