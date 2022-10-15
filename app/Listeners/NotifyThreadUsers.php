@@ -30,6 +30,6 @@ class NotifyThreadUsers
     public function handle(MessageCreated $event)
     {
         SendNewMessagesNotificationToThreadUsers::dispatch($event->message)
-            ->delay(now()->addSeconds(5));
+            ->delay(now()->addMinute());
     }
 }
