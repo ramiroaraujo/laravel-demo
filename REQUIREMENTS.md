@@ -1,8 +1,4 @@
 # message-board
-The bread-and-butter of Storyhunter is the ability of freelancers and publishers to communicate with each other. As such, we'd like to explore how you would structure a simple message exchange API. This test is designed to verify that:
-* You have proficiency with our tech stack
-* You are able to architect a working system from a small design brief
-* You are able to model relationships
 
 ## Requirements
 1. We will be building the api interface and data model for a simple message board.
